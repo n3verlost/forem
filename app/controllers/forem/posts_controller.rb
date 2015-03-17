@@ -1,12 +1,13 @@
 module Forem
   class PostsController < Forem::ApplicationController
+    helper 'forem/topics'
     before_filter :authenticate_forem_user, except: :show
     before_filter :find_topic
     before_filter :reject_locked_topic!, only: [:new, :create]
 
     def show
       find_post
-      page = (@topic.posts.count.to_f / Forem.per_page.to_f).ceil
+      page = last_page(@topic)
 
       redirect_to forum_topic_url(@topic.forum, @topic, pagination_param => page, anchor: "post-#{@post.id}")
     end
@@ -84,7 +85,7 @@ module Forem
 
     def create_successful
       flash[:notice] = t("forem.post.created")
-      redirect_to forum_topic_url(@topic.forum, @topic, pagination_param => @topic.last_page)
+      redirect_to forum_topic_url(@topic.forum, @topic, pagination_param => last_page(@topic))
     end
 
     def create_failed
