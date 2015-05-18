@@ -34,6 +34,11 @@ module Forem
       (relevant_posts(topic).count.to_f / Forem.per_page.to_f).ceil
     end
 
+    def post_page(post)
+      posts = relevant_posts(post.topic)
+      (posts.select{|p| p.id <= post.id}.count.to_f / Forem.per_page.to_f).ceil
+    end
+
     def post_time_tag(post)
       content_tag("time", datetime: post.created_at.to_s(:db)) do
         "#{time_ago_in_words(post.created_at)} #{t(:ago)}"
